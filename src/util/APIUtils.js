@@ -42,7 +42,7 @@ export function getAllSBUHeadNames() {
 
 export function checkSBUHeadAvailability(sbuHeadName) {
     return request({
-        url: API_BASE_URL + "/sbu/checkSBUHeadAvailability?sbuHeadUserName=" + sbuHeadUserName,
+        url: API_BASE_URL + "/sbu/checkSBUHeadAvailability?sbuHeadUserName=" + sbuHeadName,
         method: 'GET'
     });
 }
