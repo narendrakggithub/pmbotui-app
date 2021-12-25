@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import * as ReactDOM from "react-dom";
-import { createSbu, checkSbuNameAvailability, getAllSBUHeadNames, renderInDropDown, checkSBUHeadAvailability } from '../../util/APIUtils';
+import { createSbu, checkSbuNameAvailability, getAllSBUHeadNames, checkSBUHeadAvailability } from '../../util/APIUtils';
 import Autocomplete from 'react-autocomplete';
+import Select from 'react-select';
 import './createsbu.css';
 import { Link } from 'react-router-dom';
 import {   
@@ -19,7 +20,7 @@ class CreateSbu extends Component {
             sbuName: {
                 value: ''
             },
-            sbuHeadName: {
+            sbuHeadUserName: {
                 value: ''
             },
             sbuHeadNames: []
@@ -61,6 +62,7 @@ class CreateSbu extends Component {
     }
 
     handleInputChange(event, validationFun) {
+        console.log(event);
         const target = event.target;
         const inputName = target.name;        
         const inputValue = target.value;
@@ -73,11 +75,20 @@ class CreateSbu extends Component {
         });
     }
 
+    handleInputChange2(event, validationFun) {
+        console.log(event);  
+        const inputValue = event.value;
+        this.state.sbuHeadUserName.value=inputValue;
+        console.log(this.state.sbuHeadUserName.value);  
+        validationFun(inputValue);
+    }
+
     handleSubmit(event) {
         event.preventDefault();
     
         const createSbuRequest = {
             sbuName: this.state.sbuName.value,
+            sbuHeadUserName: this.state.sbuHeadUserName.value
         };
         createSbu(createSbuRequest)
         .then(response => {
@@ -96,20 +107,21 @@ class CreateSbu extends Component {
 
     isFormInvalid() {
         return !(
-            this.state.sbuName.validateStatus === 'success' 
+            this.state.sbuName.validateStatus === 'success' &&
+            this.state.sbuHeadUserName.validateStatus === 'success' 
         );
     }
 
     render() {
         const { editFields } = this.state;
-        const { product } = this.props; 
 
+        const sbuHeadNameViews = [];
+        this.state.sbuHeadNames.forEach((sbuHeadName, sbuHeadNameIndex) => {
+            sbuHeadNameViews.push({value: sbuHeadName.userName, label:sbuHeadName.userFullName});   
+        });
         
         return (
             <div className="createSbu-container">
-                
-
-
                 <h1 className="page-title">Create SBU</h1>
                 <div className="createSbu-content">
                     <Form onSubmit={this.handleSubmit} className="createSbu-form">
@@ -126,40 +138,17 @@ class CreateSbu extends Component {
                                 onBlur={this.validateSbuNameAvailability}
                                 onChange={(event) => this.handleInputChange(event, this.validateSbuName)} />    
                         </FormItem>
-
-                        <FormItem label="SBU Head name"
-                            hasFeedback
-                            validateStatus={this.state.sbuHeadName.validateStatus}
-                            help={this.state.sbuHeadName.errorMsg}>
-
-                            <div className="autocomplete-wrapper">
-                                <Autocomplete
-                                    name="sbuHeadName"
-                                    placeholder="A unique SBUHead name"
-                                    value={this.state.val}
-                                    items={this.state.sbuHeadNames}
-                                    getItemValue={item => item.userName}
-                                    shouldItemRender={renderInDropDown}
-                                    renderMenu={item => (
-                                        <div className="dropdown">
-                                            {item}
-                                        </div>
-                                    )}
-                                    renderItem={(item, isHighlighted) =>
-                                        <div className={`item ${isHighlighted ? 'selected-item' : ''}`}>
-                                        {item.userName}
-                                        </div>
-                                    }
-                                    onBlur={this.checkSBUHeadAvailability}
-                                    onChange={(event, val) => this.setState({ val })}
-                                    onSelect={val => this.setState({ val })}
-                                />      
-                            </div>
+                        <FormItem label="SBU head name">
+                            <Select 
+                            size="large"
+                            name="sbuHeadName"
+                            autoComplete="off"
+                            placeholder="A unique SBU Head name"
+                            onBlur={(event) => this.checkSBUHeadAvailability(event)}
+                            options={sbuHeadNameViews} 
+                            onChange={(event) => this.handleInputChange2(event, this.validateSbuHeadName)} /> 
                             
                         </FormItem>
-
-                        
-
                         <FormItem>
                             <Button type="primary" 
                                 htmlType="submit" 
@@ -196,8 +185,83 @@ class CreateSbu extends Component {
         }
     }
 
-    checkSBUHeadAvailability() {
-        
+    validateSbuHeadName = (sbuHeadName) => {
+        console.log(sbuHeadName);
+        if(!sbuHeadName) {
+            return {
+                validateStatus: 'error',
+                errorMsg: 'SBU name may not be empty'                
+            }
+        }
+
+        if(sbuHeadName.length > ANYNAME_MAX_LENGTH) {
+            return {
+                validateStatus: 'error',
+                errorMsg: `SBU name is too long (Maximum ${ANYNAME_MAX_LENGTH} characters allowed)`
+            }
+        }
+
+        return {
+            validateStatus: null,
+            errorMsg: null
+        }
+    }
+
+    checkSBUHeadAvailability(event) {
+        // First check for client side errors in sbuname
+
+        const sbuHeadUserNameValue = this.state.sbuHeadUserName.value;
+        const ssbuHeadUserNameValidation = this.validateSbuHeadName(sbuHeadUserNameValue);
+
+
+
+        if(ssbuHeadUserNameValidation.validateStatus === 'error') {
+            this.setState({
+                sbuHeadUserName: {
+                    value: sbuHeadUserNameValue,
+                    ...ssbuHeadUserNameValidation
+                }
+            });
+            return;
+        }
+
+        this.setState({
+            sbuHeadUserName: {
+                value: sbuHeadUserNameValue,
+                validateStatus: 'validating',
+                errorMsg: null
+            }
+        });
+
+        checkSBUHeadAvailability(sbuHeadUserNameValue)
+        .then(response => {
+            if(response.available) {
+                this.setState({
+                    sbuHeadUserName: {
+                        value: sbuHeadUserNameValue,
+                        validateStatus: 'success',
+                        errorMsg: null
+                    }
+                });
+            } else {
+                this.setState({
+                    sbuHeadUserName: {
+                        value: sbuHeadUserNameValue,
+                        validateStatus: 'error',
+                        errorMsg: 'This SBU head name is not valid'
+                    }
+                });
+            }
+        }).catch(error => {
+            // Marking validateStatus as success, Form will be recchecked at server
+            this.setState({
+                sbuHeadUserName: {
+                    value: sbuHeadUserNameValue,
+                    validateStatus: 'success',
+                    errorMsg: null
+                }
+            });
+        });
     }
 
 

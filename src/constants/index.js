@@ -1,7 +1,7 @@
 export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api';
 export const ACCESS_TOKEN = 'accessToken';
 
-export const COMMAND = 'npm install react-scripts; npm i react-autocomplete --save';
+export const COMMAND = 'npm install react-scripts; npm i react-autocomplete --save; npm i --save react-select';
 
 export const APP_NAME = 'PMBot';
 

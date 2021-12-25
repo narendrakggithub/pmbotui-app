@@ -8,3 +8,25 @@
     text-align: center;
     margin-bottom: 40px;    
 }
+
+.createform-container {
+    max-width: 420px;
+    margin: 0 auto;
+    margin-top: 40px;    
+}
+
+.createform-button {
+    width: 100%;
+    margin-top: 15px;
+}
+
+.createform-button[disabled], .createform-button[disabled]:hover, .createform-button[disabled]:focus {
+    opacity: 0.6;
+    color: #fff;
+    background-color: #1890ff;
+    border-color: #1890ff;
+}
+
+.createform input {
+    margin-bottom: 3px;
+}

@@ -4,6 +4,7 @@ import './Signup.css';
 import { Link } from 'react-router-dom';
 import {   
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH,
+    ANYNAME_MIN_LENGTH, ANYNAME_MAX_LENGTH,
     MANAGEREMAIL_MAX_LENGTH, 
     EMAIL_MAX_LENGTH,
     PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH, APP_NAME
@@ -18,6 +19,9 @@ class Signup extends Component {
         this.state = {
             
             userName: {
+                value: ''
+            },
+            fullName: {
                 value: ''
             },
             email: {
@@ -55,6 +59,7 @@ class Signup extends Component {
         event.preventDefault();
     
         const signupRequest = {
+            fullName: this.state.fullName.value,
             userName: this.state.userName.value,
             email: this.state.email.value,
             managerEmail: this.state.managerEmail.value,
@@ -77,6 +82,7 @@ class Signup extends Component {
 
     isFormInvalid() {
         return !(
+            this.state.fullName.validateStatus === 'success' &&
             this.state.userName.validateStatus === 'success' &&
             this.state.email.validateStatus === 'success' &&
             this.state.managerEmail.validateStatus === 'success' &&
@@ -90,6 +96,18 @@ class Signup extends Component {
                 <h1 className="page-title">Sign Up</h1>
                 <div className="signup-content">
                     <Form onSubmit={this.handleSubmit} className="signup-form">
+                        <FormItem label="Fullname"
+                            hasFeedback
+                            validateStatus={this.state.fullName.validateStatus}
+                            help={this.state.fullName.errorMsg}>
+                            <Input 
+                                size="large"
+                                name="fullName" 
+                                autoComplete="off"
+                                placeholder="Full name"
+                                value={this.state.fullName.value} 
+                                onChange={(event) => this.handleInputChange(event, this.validateFullName)} />    
+                        </FormItem>
                         <FormItem label="Username"
                             hasFeedback
                             validateStatus={this.state.userName.validateStatus}
@@ -217,6 +235,25 @@ class Signup extends Component {
         return {
             validateStatus: null,
             errorMsg: null
+        }
+    }
+
+    validateFullName = (fullName) => {
+        if(fullName.length < ANYNAME_MIN_LENGTH) {
+            return {
+                validateStatus: 'error',
+                errorMsg: `Full name is too short (Minimum ${ANYNAME_MIN_LENGTH} characters needed.)`
+            }
+        } else if (fullName.length > ANYNAME_MAX_LENGTH) {
+            return {
+                validationStatus: 'error',
+                errorMsg: `Full name is too long (Maximum ${ANYNAME_MAX_LENGTH} characters allowed.)`
+            }
+        } else {
+            return {
+                validateStatus: 'success',
+                errorMsg: null
+            }
         }
     }
 

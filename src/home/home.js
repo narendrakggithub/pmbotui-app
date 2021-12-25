@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import LoadingIndicator  from '../common/LoadingIndicator';
 import { withRouter } from 'react-router-dom';
-
+import Select from 'react-select';
 import './home.css';
+import { Form, Input, Button, notification, DatePicker } from 'antd';
+const FormItem = Form.Item;
 
 
 class Home extends Component {
@@ -45,6 +47,7 @@ class Home extends Component {
                         <div className="no-polls-found">
                             <span>This is home page xxx</span>
                         </div>    
+                        
                     ): null
                 }  
                        
