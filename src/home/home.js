@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 import LoadingIndicator  from '../common/LoadingIndicator';
 import { withRouter } from 'react-router-dom';
-import Select from 'react-select';
 import './home.css';
-import { Form, Input, Button, notification, DatePicker } from 'antd';
-const FormItem = Form.Item;
-
 
 class Home extends Component {
     constructor(props) {
@@ -14,14 +10,8 @@ class Home extends Component {
             
             isLoading: false
         };
-        
-        
     }
-
-   
-
-    componentDidMount() {
-      
+    componentDidMount() {      
     }
 
     componentDidUpdate(nextProps) {
@@ -33,14 +23,9 @@ class Home extends Component {
         }
     }
 
-    
-
     render() {
-        
-
         return (
             <div>
-                
             <div className="home-container">
                 {
                     !this.state.isLoading  ? (
@@ -49,8 +34,7 @@ class Home extends Component {
                         </div>    
                         
                     ): null
-                }  
-                       
+                }     
                 {
                     this.state.isLoading ? 
                     <LoadingIndicator />: null                     

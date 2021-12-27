@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { createAccount, checkAccountNameAvailability, 
+import { createAccount, checkAccountNameAvailability, getAllEDLUserNamesOwnedByUser, 
     getAllPDLUserNamesOwnedByUser, getAllSBUNamesOwnedByUser, confirmSBUNameExistence,
-    confirmPDLUserExistence } from '../../util/APIUtils';
+    confirmPDLUserExistence, confirmEDLUserExistence } from '../../util/APIUtils';
 import Select from 'react-select';
 import './createform.css';
 import {   
@@ -19,6 +19,10 @@ class CreateAccount extends Component {
             accountName: {
                 value: ''
             },
+            edlUserName: {
+                value: ''
+            },
+            edlFullNames: [],
             pdlUserName: {
                 value: ''
             },
@@ -32,12 +36,35 @@ class CreateAccount extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.validateAccountNameAvailability = this.validateAccountNameAvailability.bind(this);
         this.isFormInvalid = this.isFormInvalid.bind(this);
+        this.loadPossibleEDLNames = this.loadPossibleEDLNames.bind(this);
         this.loadPossiblePDLNames = this.loadPossiblePDLNames.bind(this);
         this.loadPossibleSBUNames = this.loadPossibleSBUNames.bind(this);
     }
+
+
+
+    loadPossibleEDLNames() {
+        let promise;
+        promise = getAllPossibleEDLUserNames();
+        if(!promise) {
+            return;
+        }
+        this.setState({
+            isLoading: true
+        });
+        promise            
+        .then(response => {
+            this.setState({ edlFullNames: response })
+        }).catch(error => {
+            this.setState({
+                isLoading: false
+            })
+        });  
+    }
+
     loadPossiblePDLNames() {
         let promise;
-        promise = getAllPDLUserNamesOwnedByUser();
+        promise = getAllPossiblePDLUserNames();
         if(!promise) {
             return;
         }
@@ -47,7 +74,6 @@ class CreateAccount extends Component {
         promise            
         .then(response => {
             this.setState({ pdlFullNames: response })
-            console.log(this.state.pdlFullNames);
         }).catch(error => {
             this.setState({
                 isLoading: false
@@ -58,8 +84,6 @@ class CreateAccount extends Component {
     loadPossibleSBUNames() {
         let promise;
         promise = getAllSBUNamesOwnedByUser();
-        console.log('test');
-        console.log(promise);
         if(!promise) {
             return;
         }
@@ -69,7 +93,6 @@ class CreateAccount extends Component {
         promise            
         .then(response => {
             this.setState({ sbuNames: response })
-            console.log(this.state.sbuNames);
         }).catch(error => {
             this.setState({
                 isLoading: false
@@ -78,6 +101,7 @@ class CreateAccount extends Component {
     }
 
     componentDidMount() {
+        this.loadPossibleEDLNames();
         this.loadPossiblePDLNames();
         this.loadPossibleSBUNames();
     }
@@ -95,6 +119,18 @@ class CreateAccount extends Component {
         });
     }
 
+    handleEdlUserNameChange(event, validationFun, label) {  
+        const inputValue = event.value;
+        //this.state.edlUserName.value=inputValue;
+
+        this.setState({
+            edlUserName : {
+                value: inputValue
+            }
+        });
+
+        validationFun(inputValue, label);
+    }
     handlePdlUserNameChange(event, validationFun, label) {  
         const inputValue = event.value;
         //this.state.pdlUserName.value=inputValue;
@@ -119,11 +155,11 @@ class CreateAccount extends Component {
     }
 
     handleSubmit(event) {
-        console.log('about to submit');
         event.preventDefault();
     
         const createAccountRequest = {
             accountName: this.state.accountName.value,
+            edlUserName: this.state.edlUserName.value,
             pdlUserName: this.state.pdlUserName.value,
             sbuName: this.state.sbuName.value,
         };
@@ -145,15 +181,16 @@ class CreateAccount extends Component {
     isFormInvalid() {
         return !(
             this.state.accountName.validateStatus === 'success' &&
+            this.state.edlUserName.validateStatus === 'success' &&
             this.state.pdlUserName.validateStatus === 'success' &&
             this.state.sbuName.validateStatus === 'success' 
         );
     }
 
     render() {
-        const sbuNameViews = [];
-        this.state.sbuNames.forEach((sbuNameTmp, index) => {
-            sbuNameViews.push({value: sbuNameTmp.sbuName, label:sbuNameTmp.sbuName});   
+        const edlFullNameViews = [];
+        this.state.edlFullNames.forEach((edlFullName, index) => {
+            edlFullNameViews.push({value: edlFullName.userName, label:edlFullName.userFullName});   
         });
 
         const pdlFullNameViews = [];
@@ -161,7 +198,10 @@ class CreateAccount extends Component {
             pdlFullNameViews.push({value: pdlFullName.userName, label:pdlFullName.userFullName});   
         });
 
-        
+        const sbuNameViews = [];
+        this.state.sbuNames.forEach((sbuNameTmp, index) => {
+            sbuNameViews.push({value: sbuNameTmp.userFullName, label:sbuNameTmp.userFullName});   
+        });
         
         return (
             <div className="createform-container">
@@ -203,6 +243,18 @@ class CreateAccount extends Component {
                             onBlur={(event) => this.validatePDLAvailability(event)}
                             options={pdlFullNameViews} 
                             onChange={(event) => this.handlePdlUserNameChange(event, this.validateNameField, 'PDL')} /> 
+                            
+                        </FormItem>
+
+                        <FormItem label="EDL name">
+                            <Select 
+                            size="large"
+                            name="edlUserName"
+                            autoComplete="off"
+                            placeholder="Select EDL"
+                            onBlur={(event) => this.validateEDLAvailability(event)}
+                            options={sbuNameViews} 
+                            onChange={(event) => this.handleEdlUserNameChange(event, this.validateNameField, 'EDL')} /> 
                             
                         </FormItem>
 
@@ -303,7 +355,7 @@ class CreateAccount extends Component {
 
     validateAccountNameAvailability() {
         const accountNameValue = this.state.accountName.value;
-        const accountNameValidation = this.validateNameField(accountNameValue, 'Account');
+        const accountNameValidation = this.validateAccountName(accountNameValue, 'Account');
 
         if(accountNameValidation.validateStatus === 'error') {
             this.setState({
@@ -407,6 +459,58 @@ class CreateAccount extends Component {
         });
     }
 
+    validateEDLAvailability(event) {
+        const edlUserNameValue = this.state.edlUserName.value;
+        const edlUserNameValidation = this.validateNameField(edlUserNameValue, 'EDL');
+
+        if(edlUserNameValidation.validateStatus === 'error') {
+            this.setState({
+                edlUserName: {
+                    value: edlUserNameValue,
+                    ...edlUserNameValidation
+                }
+            });
+            return;
+        }
+
+        this.setState({
+            edlUserName: {
+                value: edlUserNameValue,
+                validateStatus: 'validating',
+                errorMsg: null
+            }
+        });
+
+        confirmEDLUserExistence(edlUserNameValue)
+        .then(response => {
+            if(response.available) {
+                this.setState({
+                    edlUserName: {
+                        value: edlUserNameValue,
+                        validateStatus: 'success',
+                        errorMsg: null
+                    }
+                });
+            } else {
+                this.setState({
+                    edlUserName: {
+                        value: edlUserNameValue,
+                        validateStatus: 'error',
+                        errorMsg: 'This EDL name is not valid'
+                    }
+                });
+            }
+        }).catch(error => {
+            // Marking validateStatus as success, Form will be recchecked at server
+            this.setState({
+                edlUserName: {
+                    value: edlUserNameValue,
+                    validateStatus: 'success',
+                    errorMsg: null
+                }
+            });
+        });
+    }
 
 
 }

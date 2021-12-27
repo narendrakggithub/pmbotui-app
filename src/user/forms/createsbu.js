@@ -1,16 +1,13 @@
 import React, { Component } from 'react';
-import * as ReactDOM from "react-dom";
 import { createSbu, checkSbuNameAvailability, getAllSBUHeadNames, checkSBUHeadAvailability } from '../../util/APIUtils';
-import Autocomplete from 'react-autocomplete';
 import Select from 'react-select';
 import './createsbu.css';
-import { Link } from 'react-router-dom';
 import {   
-    ANYNAME_MIN_LENGTH, ANYNAME_MAX_LENGTH,
+    ANYNAME_MAX_LENGTH,
     APP_NAME
 } from '../../constants';
 
-import { Form, Input, Button, notification, DatePicker } from 'antd';
+import { Form, Input, Button, notification } from 'antd';
 const FormItem = Form.Item;
 
 class CreateSbu extends Component {
@@ -78,7 +75,14 @@ class CreateSbu extends Component {
     handleInputChange2(event, validationFun) {
         console.log(event);  
         const inputValue = event.value;
-        this.state.sbuHeadUserName.value=inputValue;
+        //this.state.sbuHeadUserName.value=inputValue;
+
+        this.setState({
+            sbuHeadUserName : {
+                value: inputValue
+            }
+        });
+
         console.log(this.state.sbuHeadUserName.value);  
         validationFun(inputValue);
     }
@@ -113,8 +117,6 @@ class CreateSbu extends Component {
     }
 
     render() {
-        const { editFields } = this.state;
-
         const sbuHeadNameViews = [];
         this.state.sbuHeadNames.forEach((sbuHeadName, sbuHeadNameIndex) => {
             sbuHeadNameViews.push({value: sbuHeadName.userName, label:sbuHeadName.userFullName});   

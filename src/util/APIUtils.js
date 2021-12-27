@@ -40,6 +40,45 @@ export function getAllSBUHeadNames() {
     });
 }
 
+export function getAllPossibleEDLUserNames() {
+    return request({
+        url: API_BASE_URL + "/user/getAllPossibleEDLUserNames",
+        method: 'GET'
+    });
+}
+
+export function getAllPossiblePDLUserNames() {
+    return request({
+        url: API_BASE_URL + "/user/getAllPossiblePDLUserNames",
+        method: 'GET'
+    });
+}
+
+export function getAllPossibleSBUNames() {
+    return request({
+        url: API_BASE_URL + "/user/getAllPossibleSBUNames",
+        method: 'GET'
+    });
+}
+
+export function getAllSBUNamesOwnedByUser() {
+    return request({
+        url: API_BASE_URL + "/sbu/getAllSBUNamesOwnedByUser",
+        method: 'GET'
+    });
+}
+
+export function getAllPDLUserNamesOwnedByUser() {
+    return request({
+        url: API_BASE_URL + "/user/getAllPDLUserNamesOwnedByUser",
+        method: 'GET'
+    });
+}
+
+
+
+
+
 export function checkSBUHeadAvailability(sbuHeadName) {
     return request({
         url: API_BASE_URL + "/sbu/checkSBUHeadAvailability?sbuHeadUserName=" + sbuHeadName, //just cmd
@@ -97,6 +136,14 @@ export function createSbu(createSbuRequest) {
     });
 }
 
+export function createAccount(createAccountRequest) {
+    return request({
+        url: API_BASE_URL + "/account/createAccount",
+        method: 'POST',
+        body: JSON.stringify(createAccountRequest)
+    });
+}
+
 export function checkUserNameAvailability(userName) {
     return request({
         url: API_BASE_URL + "/user/checkUserNameAvailability?userName=" + userName,
@@ -128,6 +175,34 @@ export function checkProjectNameAvailability(projectName) {
 export function checkSbuNameAvailability(sbuName) {
     return request({
         url: API_BASE_URL + "/sbu/checkSbuNameAvailability?sbuName=" + sbuName,
+        method: 'GET'
+    });
+}
+
+export function confirmSBUNameExistence(sbuName) {
+    return request({
+        url: API_BASE_URL + "/user/confirmSBUNameExistence?sbuName=" + sbuName,
+        method: 'GET'
+    });
+}
+
+export function confirmPDLUserExistence(pdlUserName) {
+    return request({
+        url: API_BASE_URL + "/user/confirmPDLUserExistence?pdlUserName=" + pdlUserName,
+        method: 'GET'
+    });
+}
+
+export function confirmEDLUserExistence(edlUserName) {
+    return request({
+        url: API_BASE_URL + "/user/confirmEDLUserExistence?edlUserName=" + edlUserName,
+        method: 'GET'
+    });
+}
+
+export function checkAccountNameAvailability(accountName) {
+    return request({
+        url: API_BASE_URL + "/account/checkAccountNameAvailability?accountName=" + accountName,
         method: 'GET'
     });
 }

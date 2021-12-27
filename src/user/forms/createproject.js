@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import { createProject, checkProjectNameAvailability, checkSubLobNameAvailability, checkManagerEmailAvailability, checkCustomerNameAvailability } from '../../util/APIUtils';
 import './createproject.css';
-import { Link } from 'react-router-dom';
 import {   
     ANYNAME_MIN_LENGTH, ANYNAME_MAX_LENGTH,
     MANAGEREMAIL_MAX_LENGTH, 
     APP_NAME
 } from '../../constants';
 
-import { Form, Input, Button, notification, DatePicker } from 'antd';
+import { Form, Input, Button, notification } from 'antd';
 const FormItem = Form.Item;
 
 class CreateProject extends Component {
