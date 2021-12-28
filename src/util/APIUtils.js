@@ -136,6 +136,14 @@ export function createLob(createLobRequest) {
     });
 }
 
+export function createCustomer(createCustomerRequest) {
+    return request({
+        url: API_BASE_URL + "/customer/createCustomerRequest",
+        method: 'POST',
+        body: JSON.stringify(createCustomerRequest)
+    });
+}
+
 export function checkUserNameAvailability(userName) {
     return request({
         url: API_BASE_URL + "/user/checkUserNameAvailability?userName=" + userName,
@@ -206,6 +214,13 @@ export function checkLobNameAvailabilityForUser(lobName, accountId) {
     });
 }
 
+export function checkCustomerNameAvailabilityForUser(customerName, accountId) {
+    return request({
+        url: API_BASE_URL + "/customer/checkCustomerNameAvailabilityForUser?customerName=" + customerName+ "&accountId=" + accountId,
+        method: 'GET'
+    });
+}
+
 export function confirmAccountIdExistenceForUser(accountId) {
     return request({
         url: API_BASE_URL + "/account/confirmAccountIdExistenceForUser?accountId=" + accountId,
@@ -213,9 +228,16 @@ export function confirmAccountIdExistenceForUser(accountId) {
     });
 }
 
-export function confirmLobLeadExistenceForUser(lobLeadId) {
+export function confirmLobLeadExistenceForUser(lobLeadUserNameValue) {
     return request({
-        url: API_BASE_URL + "/user/confirmLobLeadExistenceForUser?lobLeadId=" + lobLeadId,
+        url: API_BASE_URL + "/user/confirmLobLeadExistenceForUser?lobLeadUserNameValue=" + lobLeadUserNameValue,
+        method: 'GET'
+    });
+}
+
+export function confirmCustomerLeadExistenceForUser(customerLeadUserName) {
+    return request({
+        url: API_BASE_URL + "/user/confirmCustomerLeadExistenceForUser?customerLeadUserName=" + customerLeadUserName,
         method: 'GET'
     });
 }
