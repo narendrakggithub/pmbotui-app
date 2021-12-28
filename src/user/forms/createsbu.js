@@ -119,7 +119,7 @@ class CreateSbu extends Component {
     render() {
         const sbuHeadNameViews = [];
         this.state.sbuHeadNames.forEach((sbuHeadName, sbuHeadNameIndex) => {
-            sbuHeadNameViews.push({value: sbuHeadName.userName, label:sbuHeadName.userFullName});   
+            sbuHeadNameViews.push({value: sbuHeadName.userName, label:sbuHeadName.userFullName + " | " + sbuHeadName.grade + " | " + sbuHeadName.userName});   
         });
         
         return (
