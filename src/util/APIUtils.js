@@ -79,7 +79,12 @@ export function getAllAccountsOwnedByUser() {
     });
 }
 
-
+export function getAllLobsOwnedByUser() {
+    return request({
+        url: API_BASE_URL + "/lob/getAllLobsOwnedByUser",
+        method: 'GET'
+    });
+}
 
 export function checkSBUHeadAvailability(sbuHeadName) {
     return request({
@@ -141,6 +146,14 @@ export function createCustomer(createCustomerRequest) {
         url: API_BASE_URL + "/customer/createCustomerRequest",
         method: 'POST',
         body: JSON.stringify(createCustomerRequest)
+    });
+}
+
+export function createSubLob(createSubLobRequest) {
+    return request({
+        url: API_BASE_URL + "/subLob/createSubLobRequest",
+        method: 'POST',
+        body: JSON.stringify(createSubLobRequest)
     });
 }
 
@@ -221,9 +234,23 @@ export function checkCustomerNameAvailabilityForUser(customerName, accountId) {
     });
 }
 
+export function checkSubLobNameAvailabilityForUser(subLobName, lobId) {
+    return request({
+        url: API_BASE_URL + "/subLob/checkSubLobNameAvailabilityForUser?subLobName=" + subLobName+ "&lobId=" + lobId,
+        method: 'GET'
+    });
+}
+
 export function confirmAccountIdExistenceForUser(accountId) {
     return request({
         url: API_BASE_URL + "/account/confirmAccountIdExistenceForUser?accountId=" + accountId,
+        method: 'GET'
+    });
+}
+
+export function confirmLobIdExistenceForUser(lobId) {
+    return request({
+        url: API_BASE_URL + "/lob/confirmLobIdExistenceForUser?lobId=" + lobId,
         method: 'GET'
     });
 }
@@ -238,6 +265,13 @@ export function confirmLobLeadExistenceForUser(lobLeadUserNameValue) {
 export function confirmCustomerLeadExistenceForUser(customerLeadUserName) {
     return request({
         url: API_BASE_URL + "/user/confirmCustomerLeadExistenceForUser?customerLeadUserName=" + customerLeadUserName,
+        method: 'GET'
+    });
+}
+
+export function confirmSubLobLeadExistenceForUser(subLobLeadUserName) {
+    return request({
+        url: API_BASE_URL + "/user/confirmSubLobLeadExistenceForUser?subLobLeadUserName=" + subLobLeadUserName,
         method: 'GET'
     });
 }
