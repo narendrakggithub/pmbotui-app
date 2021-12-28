@@ -23,6 +23,7 @@ import { Layout, notification } from 'antd';
 import CreateProject from '../user/forms/createproject';
 import CreateSbu from '../user/forms/createsbu';
 import CreateAccount from '../user/forms/createaccount';
+import CreateLOB from '../user/forms/createlob';
 const { Content } = Layout;
 
 class App extends Component {
@@ -116,6 +117,7 @@ class App extends Component {
                 <PrivateRoute authenticated={this.state.isAuthenticated} path="/project/createProject" component={CreateProject} handleLogout={this.handleLogout}></PrivateRoute>
                 <PrivateRoute authenticated={this.state.isAuthenticated} path="/sbu/createSbu" component={CreateSbu} handleLogout={this.handleLogout}></PrivateRoute>
                 <PrivateRoute authenticated={this.state.isAuthenticated} path="/account/createAccount" component={CreateAccount} handleLogout={this.handleLogout}></PrivateRoute>
+                <PrivateRoute authenticated={this.state.isAuthenticated} path="/lob/createLob" component={CreateLOB} handleLogout={this.handleLogout}></PrivateRoute>
                 <Route component={NotFound}></Route>
               </Switch>
             </div>

@@ -23,16 +23,6 @@ const request = (options) => {
     );
 };
 
-export function getAllPolls(page, size) {
-    page = page || 0;
-    size = size || POLL_LIST_SIZE;
-
-    return request({
-        url: API_BASE_URL + "/polls?page=" + page + "&size=" + size,
-        method: 'GET'
-    });
-}
-
 export function getAllSBUHeadNames() {
     return request({
         url: API_BASE_URL + "/sbu/getEligibleSBUHeads",
@@ -40,7 +30,7 @@ export function getAllSBUHeadNames() {
     });
 }
 
-export function getAllPossibleEDLUserNames() {
+/*export function getAllPossibleEDLUserNames() {
     return request({
         url: API_BASE_URL + "/user/getAllPossibleEDLUserNames",
         method: 'GET'
@@ -59,7 +49,7 @@ export function getAllPossibleSBUNames() {
         url: API_BASE_URL + "/user/getAllPossibleSBUNames",
         method: 'GET'
     });
-}
+}*/
 
 export function getAllSBUNamesOwnedByUser() {
     return request({
@@ -75,7 +65,19 @@ export function getAllPDLUserNamesOwnedByUser() {
     });
 }
 
+export function getAllReporteesOfCurrentUser() {
+    return request({
+        url: API_BASE_URL + "/user/getAllReporteesOfCurrentUser",
+        method: 'GET'
+    });
+}
 
+export function getAllAccountsOwnedByUser() {
+    return request({
+        url: API_BASE_URL + "/account/getAllAccountsOwnedByUser",
+        method: 'GET'
+    });
+}
 
 
 
@@ -83,24 +85,6 @@ export function checkSBUHeadAvailability(sbuHeadName) {
     return request({
         url: API_BASE_URL + "/sbu/checkSBUHeadAvailability?sbuHeadUserName=" + sbuHeadName, //just cmd
         method: 'GET'
-    });
-}
-
-
-
-export function createPoll(pollData) {
-    return request({
-        url: API_BASE_URL + "/polls",
-        method: 'POST',
-        body: JSON.stringify(pollData)         
-    });
-}
-
-export function castVote(voteData) {
-    return request({
-        url: API_BASE_URL + "/polls/" + voteData.pollId + "/votes",
-        method: 'POST',
-        body: JSON.stringify(voteData)
     });
 }
 
@@ -141,6 +125,14 @@ export function createAccount(createAccountRequest) {
         url: API_BASE_URL + "/account/createAccount",
         method: 'POST',
         body: JSON.stringify(createAccountRequest)
+    });
+}
+
+export function createLob(createLobRequest) {
+    return request({
+        url: API_BASE_URL + "/lob/createLobRequest",
+        method: 'POST',
+        body: JSON.stringify(createLobRequest)
     });
 }
 
@@ -207,6 +199,27 @@ export function checkAccountNameAvailability(accountName) {
     });
 }
 
+export function checkLobNameAvailabilityForUser(lobName, accountId) {
+    return request({
+        url: API_BASE_URL + "/lob/checkLobNameAvailabilityForUser?lobName=" + lobName+ "&accountId=" + accountId,
+        method: 'GET'
+    });
+}
+
+export function confirmAccountIdExistenceForUser(accountId) {
+    return request({
+        url: API_BASE_URL + "/account/confirmAccountIdExistenceForUser?accountId=" + accountId,
+        method: 'GET'
+    });
+}
+
+export function confirmLobLeadExistenceForUser(lobLeadId) {
+    return request({
+        url: API_BASE_URL + "/user/confirmLobLeadExistenceForUser?lobLeadId=" + lobLeadId,
+        method: 'GET'
+    });
+}
+
 export function checkSubLobNameAvailability(subLobName) {
     return request({
         url: API_BASE_URL + "/subLob/checkSubLobNameAvailability?subLobName=" + subLobName,
@@ -220,7 +233,6 @@ export function checkCustomerNameAvailability(customerName) {
         method: 'GET'
     });
 }
-
 
 export function getCurrentUser() {
     if(!localStorage.getItem(ACCESS_TOKEN)) {
@@ -250,11 +262,32 @@ export function getUserCreatedPolls(userName, page, size) {
     });
 }
 
-export function renderInDropDown(state, val) {
-    return (
-        state.userName.toLowerCase().indexOf(val.toLowerCase()) !== -1
-    );
-  }
+export function getAllPolls(page, size) {
+    page = page || 0;
+    size = size || POLL_LIST_SIZE;
+
+    return request({
+        url: API_BASE_URL + "/polls?page=" + page + "&size=" + size,
+        method: 'GET'
+    });
+}
+
+
+export function createPoll(pollData) {
+    return request({
+        url: API_BASE_URL + "/polls",
+        method: 'POST',
+        body: JSON.stringify(pollData)         
+    });
+}
+
+export function castVote(voteData) {
+    return request({
+        url: API_BASE_URL + "/polls/" + voteData.pollId + "/votes",
+        method: 'POST',
+        body: JSON.stringify(voteData)
+    });
+}
 
 export function getUserVotedPolls(userName, page, size) {
     page = page || 0;
