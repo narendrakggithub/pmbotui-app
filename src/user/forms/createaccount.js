@@ -158,7 +158,7 @@ class CreateAccount extends Component {
 
         const pdlFullNameViews = [];
         this.state.pdlFullNames.forEach((pdlFullName, index) => {
-            pdlFullNameViews.push({value: pdlFullName.userName, label:pdlFullName.userFullName});   
+            pdlFullNameViews.push({value: pdlFullName.userName, label:pdlFullName.fullName});   
         });
 
         

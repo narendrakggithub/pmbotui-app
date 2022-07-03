@@ -208,7 +208,7 @@ class CreateSubLob extends Component {
                                 htmlType="submit" 
                                 size="large" 
                                 className="createform-form-button"
-                                disabled={this.isFormInvalid()}>Create CUSTOMER</Button>
+                                disabled={this.isFormInvalid()}>Create Sub Lob</Button>
                         </FormItem>
                     </Form>
                 </div>

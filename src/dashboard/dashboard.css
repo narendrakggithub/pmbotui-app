@@ -1,0 +1,88 @@
+.fullpageview-container {
+    margin: 0 auto;
+    margin-top: 5px;    
+}
+
+.fullpageview-content {
+  margin: 10px;
+  margin-top: 5px;    
+ 
+}
+
+.pagetitle {
+  font-size: 15px;
+  text-align: left;
+  padding: 2px;    
+}
+
+.fullpageview-button {
+    width: 100%;
+    margin-top: 15px;
+}
+
+.fullpageview-button[disabled], .fullpageview-button[disabled]:hover, .fullpageview-button[disabled]:focus {
+    opacity: 0.6;
+    color: #fff;
+    background-color: #1890ff;
+    border-color: #1890ff;
+}
+
+.fullpageview input {
+  margin-bottom: 3px;
+}
+
+.h1titleleft {
+  font-size: 15px;
+  padding: 2px;   
+  
+  text-align: left;
+  float: left;
+}
+
+.tdcenter {
+    text-align:center; 
+}
+
+.h1titleright {
+  font-size: 12px;
+  padding: 2px; 
+  margin-right: 50px;
+  margin-top: 10px;
+  text-align: right;
+  float: right;
+}
+
+
+  
+  #tablecss {
+    text-align: left;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 15px;
+    border-collapse: collapse;
+    border: 3px solid #ddd;
+    width: 100%;
+  }
+  
+  #tablecss td, #tablecss th {
+    border: 1px  #ddd;
+    padding: 2px;
+  }
+  
+  #tablecss tr:nth-child(even){background-color: #f2f2f2;}
+  
+  #tablecss tr:hover {background-color: #ddd;}
+  
+  #tablecss th {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    background-color: #4c87af;
+    color: white;
+  }
+
+  .icon {
+    width: 30px;
+    height: 30px;
+    margin-left: auto;
+  margin-right: auto;
+  text-align:center;
+  }

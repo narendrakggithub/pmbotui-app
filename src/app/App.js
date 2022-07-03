@@ -18,7 +18,7 @@ import AppHeader from '../common/AppHeader';
 import NotFound from '../common/NotFound';
 import LoadingIndicator from '../common/LoadingIndicator';
 import PrivateRoute from '../common/PrivateRoute';
-
+import { Role } from '../common/role';
 import { Layout, notification } from 'antd';
 import CreateProject from '../user/forms/createproject';
 import CreateSbu from '../user/forms/createsbu';
@@ -103,7 +103,8 @@ class App extends Component {
             onLogout={this.handleLogout} />
 
           <Content className="app-content">
-            <div className="container">
+      
+            <div >
               <Switch>      
                 <Route exact path="/" 
                   render={(props) => <Home isAuthenticated={this.state.isAuthenticated} 
@@ -116,12 +117,12 @@ class App extends Component {
                   render={(props) => <Profile isAuthenticated={this.state.isAuthenticated} currentUser={this.state.currentUser} {...props}  />}>
                 </Route>
                 <PrivateRoute authenticated={this.state.isAuthenticated} path="/poll/new" component={NewPoll} handleLogout={this.handleLogout}></PrivateRoute>
-                <PrivateRoute authenticated={this.state.isAuthenticated} path="/project/createProject" component={CreateProject} handleLogout={this.handleLogout}></PrivateRoute>
-                <PrivateRoute authenticated={this.state.isAuthenticated} path="/sbu/createSbu" component={CreateSbu} handleLogout={this.handleLogout}></PrivateRoute>
-                <PrivateRoute authenticated={this.state.isAuthenticated} path="/account/createAccount" component={CreateAccount} handleLogout={this.handleLogout}></PrivateRoute>
-                <PrivateRoute authenticated={this.state.isAuthenticated} path="/lob/createLob" component={CreateLOB} handleLogout={this.handleLogout}></PrivateRoute>
-                <PrivateRoute authenticated={this.state.isAuthenticated} path="/customer/createCustomer" component={CreateCustomer} handleLogout={this.handleLogout}></PrivateRoute>
-                <PrivateRoute authenticated={this.state.isAuthenticated} path="/subLob/createSubLob" component={CreateSubLob} handleLogout={this.handleLogout}></PrivateRoute>
+                <PrivateRoute authenticated={this.state.isAuthenticated} path="/project/createProject" roles={[Role.SubLOBLead, Role.CustomerLead]} currentUser={this.state.currentUser} component={CreateProject} handleLogout={this.handleLogout}></PrivateRoute>
+                <PrivateRoute authenticated={this.state.isAuthenticated} path="/sbu/createSbu" roles={[Role.Admin]} currentUser={this.state.currentUser} component={CreateSbu} handleLogout={this.handleLogout}></PrivateRoute>
+                <PrivateRoute authenticated={this.state.isAuthenticated} path="/account/createAccount" roles={[Role.SBUHead]} currentUser={this.state.currentUser}  component={CreateAccount} handleLogout={this.handleLogout}></PrivateRoute>
+                <PrivateRoute authenticated={this.state.isAuthenticated} path="/lob/createLob" roles={[Role.EDL]} currentUser={this.state.currentUser}  component={CreateLOB} handleLogout={this.handleLogout}></PrivateRoute>
+                <PrivateRoute authenticated={this.state.isAuthenticated} path="/customer/createCustomer" roles={[Role.EDL]} currentUser={this.state.currentUser}  component={CreateCustomer} handleLogout={this.handleLogout}></PrivateRoute>
+                <PrivateRoute authenticated={this.state.isAuthenticated} path="/subLob/createSubLob"   roles={[Role.LOBLead]} currentUser={this.state.currentUser} component={CreateSubLob} handleLogout={this.handleLogout}></PrivateRoute>
                 <Route component={NotFound}></Route>
               </Switch>
             </div>

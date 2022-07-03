@@ -208,7 +208,7 @@ class CreateCustomer extends Component {
                                 htmlType="submit" 
                                 size="large" 
                                 className="createform-form-button"
-                                disabled={this.isFormInvalid()}>Create CUSTOMER</Button>
+                                disabled={this.isFormInvalid()}>Create Customer</Button>
                         </FormItem>
                     </Form>
                 </div>

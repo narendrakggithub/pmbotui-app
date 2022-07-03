@@ -14,6 +14,7 @@ export function formatDate(dateString) {
   
     return monthNames[monthIndex] + ' ' + year;
 }
+
   
 export function formatDateTime(dateTimeString) {
   const date = new Date(dateTimeString);

@@ -23,6 +23,8 @@ const request = (options) => {
     );
 };
 
+
+
 export function getAllSBUHeadNames() {
     return request({
         url: API_BASE_URL + "/sbu/getEligibleSBUHeads",
@@ -30,13 +32,43 @@ export function getAllSBUHeadNames() {
     });
 }
 
-/*export function getAllPossibleEDLUserNames() {
+export function getAllAssociates() {
     return request({
-        url: API_BASE_URL + "/user/getAllPossibleEDLUserNames",
+        url: API_BASE_URL + "/user/getAllAssociates",
         method: 'GET'
     });
 }
 
+export function getNewUsersToApprove() {
+    return request({
+        url: API_BASE_URL + "/user/getNewUsersToApprove",
+        method: 'GET'
+    });
+}
+
+export function getAccountsToAssignEDL() {
+    return request({
+        url: API_BASE_URL + "/account/getAccountsToAssignEDL",
+        method: 'GET'
+    });
+}
+
+export function getAllGrades() {
+    return request({
+        url: API_BASE_URL + "/grade/getAllGrades",
+        method: 'GET'
+    });
+}
+
+
+
+export function getAllEDLUserNamesOwnedByUser() {
+    return request({
+        url: API_BASE_URL + "/user/getAllEDLUserNamesOwnedByUser",
+        method: 'GET'
+    });
+}
+/*
 export function getAllPossiblePDLUserNames() {
     return request({
         url: API_BASE_URL + "/user/getAllPossiblePDLUserNames",
@@ -86,9 +118,65 @@ export function getAllLobsOwnedByUser() {
     });
 }
 
+export function getMySubLobList() {
+    return request({
+        url: API_BASE_URL + "/sublob/getMySubLobList",
+        method: 'GET'
+    });
+}
+
+export function getMyCustomerList() {
+    return request({
+        url: API_BASE_URL + "/customer/getMyCustomerList",
+        method: 'GET'
+    });
+}
+
 export function checkSBUHeadAvailability(sbuHeadName) {
     return request({
         url: API_BASE_URL + "/sbu/checkSBUHeadAvailability?sbuHeadUserName=" + sbuHeadName, //just cmd
+        method: 'GET'
+    });
+}
+
+export function serCheckSubLobIDAvailabilityForUser(subLobIdValue) {
+    return request({
+        url: API_BASE_URL + "/sublob/checkSubLobIDAvailabilityForUser?subLobIdValue=" + subLobIdValue, //just cmd
+        method: 'GET'
+    });
+}
+
+export function serCheckCustomerIdAvailabilityForUser(customerIdValue) {
+    return request({
+        url: API_BASE_URL + "/customer/checkCustomerIdAvailabilityForUser?customerIdValue=" + customerIdValue, //just cmd
+        method: 'GET'
+    });
+}
+
+export function updateGradeForAssociate(gradeSelectedValue, userName) {
+    return request({
+        url: API_BASE_URL + "/user/updateGradeForAssociate?gradeSelectedValue=" + gradeSelectedValue+ "&userName=" + userName,
+        method: 'GET'
+    });
+}
+
+export function assignEDLForAccount(edlUserName, accountName) {
+    return request({
+        url: API_BASE_URL + "/account/assignEDLForAccount?edlUserName=" + edlUserName+ "&accountName=" + accountName,
+        method: 'GET'
+    });
+}
+
+export function updateManagerForAssociate(managerUsername, userName) {
+    return request({
+        url: API_BASE_URL + "/user/updateManagerForAssociate?managerUsername=" + managerUsername+ "&userName=" + userName,
+        method: 'GET'
+    });
+}
+
+export function approveAssociateLogin(userName, flag) {
+    return request({
+        url: API_BASE_URL + "/user/approveAssociateLogin?userName=" + userName+ "&flag=" + flag,
         method: 'GET'
     });
 }
@@ -111,7 +199,7 @@ export function signup(signupRequest) {
 
 export function createProject(createProjectRequest) {
     return request({
-        url: API_BASE_URL + "/project/createProject",
+        url: API_BASE_URL + "/project/createproject",
         method: 'POST',
         body: JSON.stringify(createProjectRequest)
     });
@@ -122,6 +210,14 @@ export function createSbu(createSbuRequest) {
         url: API_BASE_URL + "/sbu/createSbu",
         method: 'POST',
         body: JSON.stringify(createSbuRequest)
+    });
+}
+
+export function approveUsrLogin(userApproveRequest) {
+    return request({
+        url: API_BASE_URL + "/sbu/createSbu",
+        method: 'POST',
+        body: JSON.stringify(userApproveRequest)
     });
 }
 
@@ -272,6 +368,13 @@ export function confirmCustomerLeadExistenceForUser(customerLeadUserName) {
 export function confirmSubLobLeadExistenceForUser(subLobLeadUserName) {
     return request({
         url: API_BASE_URL + "/user/confirmSubLobLeadExistenceForUser?subLobLeadUserName=" + subLobLeadUserName,
+        method: 'GET'
+    });
+}
+
+export function confirmProjectManagerAvailabilityForUser(pmUserNameValue) {
+    return request({
+        url: API_BASE_URL + "/user/confirmProjectManagerAvailabilityForUser?pmUserNameValue=" + pmUserNameValue,
         method: 'GET'
     });
 }

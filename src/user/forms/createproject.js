@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import { createProject, checkProjectNameAvailability, checkSubLobNameAvailability, checkManagerEmailAvailability, checkCustomerNameAvailability } from '../../util/APIUtils';
+import { createProject, checkProjectNameAvailability, 
+    checkSubLobNameAvailability, confirmProjectManagerAvailabilityForUser, 
+    checkCustomerNameAvailability, getAllReporteesOfCurrentUser,
+    getMySubLobList, getMyCustomerList, serCheckSubLobIDAvailabilityForUser,
+    serCheckCustomerIdAvailabilityForUser} from '../../util/APIUtils';
 import './createproject.css';
-import {   
-    ANYNAME_MIN_LENGTH, ANYNAME_MAX_LENGTH,
-    MANAGEREMAIL_MAX_LENGTH, 
-    APP_NAME
-} from '../../constants';
-
+import {ANYNAME_MAX_LENGTH, APP_NAME} from '../../constants';
+import Select from 'react-select';
 import { Form, Input, Button, notification } from 'antd';
+import validator from 'validator';
 const FormItem = Form.Item;
 
 class CreateProject extends Component {
@@ -23,35 +24,107 @@ class CreateProject extends Component {
             endDate: {
                 value: ''
             },
-            managerEmail: {
+            subLobId: {
                 value: ''
             },
-            subLobName: {
+            customerId: {
                 value: ''
             },
-            customerName: {
+            pmUserName: {
                 value: ''
-            }
+            },
+            eligibleProjectManagers: [],
+            mySubLobList: [],
+            myCustomerList: []
+
         }
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.validateProjectNameAvailability = this.validateProjectNameAvailability.bind(this);
-        this.validateManagerEmailAvailability = this.validateManagerEmailAvailability.bind(this);
+        this.checkProjectManagerAvailabilityForUser = this.checkProjectManagerAvailabilityForUser.bind(this);
         this.validateSubLobNameAvailability = this.validateSubLobNameAvailability.bind(this);
         this.validateCustomerNameAvailability = this.validateCustomerNameAvailability.bind(this);
-        
         this.isFormInvalid = this.isFormInvalid.bind(this);
+        this.loadEligibleProjectManagers = this.loadEligibleProjectManagers.bind(this);
+        this.loadSubLobList = this.loadSubLobList.bind(this);
+        this.loadCustomerList = this.loadCustomerList.bind(this);
     }
 
-    handleInputChange(event, validationFun) {
+    loadEligibleProjectManagers() {
+        let promise;
+        promise = getAllReporteesOfCurrentUser();
+        if(!promise) {
+            return;
+        }
+        this.setState({
+            isLoading: true
+        });
+        promise            
+        .then(response => {
+            this.setState({ eligibleProjectManagers: response })
+            
+        }).catch(error => {
+            this.setState({
+                isLoading: false
+            })
+        });  
+    }
+
+    componentDidMount() {
+        this.loadEligibleProjectManagers();
+        this.loadSubLobList();
+        this.loadCustomerList();
+    }
+
+    loadSubLobList() {
+        let promise;
+        promise = getMySubLobList();
+        if(!promise) {
+            return;
+        }
+        this.setState({
+            isLoading: true
+        });
+        promise            
+        .then(response => {
+            this.setState({ mySubLobList: response })
+        }).catch(error => {
+            this.setState({
+                isLoading: false
+            })
+        });  
+    }
+
+    loadCustomerList() {
+        let promise;
+        promise = getMyCustomerList();
+        if(!promise) {
+            return;
+        }
+        this.setState({
+            isLoading: true
+        });
+        promise            
+        .then(response => {
+            this.setState({ myCustomerList: response })
+        }).catch(error => {
+            this.setState({
+                isLoading: false
+            })
+        });  
+    }
+
+    handleInputChange(event, validationFun, label) {
         const target = event.target;
         const inputName = target.name;        
+        console.log(target.name);
         const inputValue = target.value;
+        console.log(target.value);
 
         this.setState({
             [inputName] : {
                 value: inputValue,
-                ...validationFun(inputValue)
+                ...validationFun(inputValue, label)
             }
         });
     }
@@ -63,9 +136,9 @@ class CreateProject extends Component {
             projectName: this.state.projectName.value,
             startDate: this.state.startDate.value,
             endDate: this.state.endDate.value,
-            managerEmail: this.state.managerEmail.value,
-            subLobName: this.state.subLobName.value,
-            customerName: this.state.customerName.value
+            pmUserName: this.state.pmUserName.value,
+            subLobId: this.state.subLobId.value,
+            customerId: this.state.customerId.value
         };
         createProject(createProjectRequest)
         .then(response => {
@@ -82,18 +155,54 @@ class CreateProject extends Component {
         });
     }
 
-    isFormInvalid() {
-        return !(
-            this.state.projectName.validateStatus === 'success' &&
-            this.state.startDate.validateStatus === 'success' &&
-            this.state.endDate.validateStatus === 'success' &&
-            this.state.managerEmail.validateStatus === 'success' &&
-            this.state.subLobName.validateStatus === 'success' &&
-            this.state.customerName.validateStatus === 'success'
-        );
+    
+
+    handlePMUserNameChange(event, validationFun, label) {  
+        const inputValue = event.value;
+        this.setState({
+            pmUserName : {
+                value: inputValue
+            }
+        });
+        validationFun(inputValue, label);
+    }
+
+    handleSubLobIDChange(event, validationFun, label) {  
+        const inputValue = event.value;
+        this.setState({
+            subLobId : {
+                value: inputValue
+            }
+        });
+        validationFun(inputValue, label);
+    }
+
+    handleCustomerIDChange(event, validationFun, label) {  
+        const inputValue = event.value;
+        this.setState({
+            customerId : {
+                value: inputValue
+            }
+        });
+        validationFun(inputValue, label);
     }
 
     render() {
+        const lvPMListView = [];
+        this.state.eligibleProjectManagers.forEach((item, index) => {
+            lvPMListView.push({value: item.userName, label:item.fullName});   
+        });
+
+        const lvSubLobListView = [];
+        this.state.mySubLobList.forEach((item, index) => {
+            lvSubLobListView.push({value: item.id, label:item.subLobName});   
+        });
+
+        const lvCustomerListView = [];
+        this.state.myCustomerList.forEach((item, index) => {
+            lvCustomerListView.push({value: item.id, label:item.customerName});   
+        });
+
         return (
             <div className="createProject-container">
                 <h1 className="page-title">Create Project</h1>
@@ -110,7 +219,7 @@ class CreateProject extends Component {
                                 placeholder="A unique project name"
                                 value={this.state.projectName.value} 
                                 onBlur={this.validateProjectNameAvailability}
-                                onChange={(event) => this.handleInputChange(event, this.validateProjectName)} />    
+                                onChange={(event) => this.handleInputChange(event, this.validateNameField, 'Project')} />    
                         </FormItem>
 
                         <FormItem label="Start Date"
@@ -124,8 +233,7 @@ class CreateProject extends Component {
                                 autoComplete="off"
                                 placeholder="Start Date"
                                 value={this.state.startDate.value} 
-                                onBlur={this.validateStartDate}
-                                onChange={(event) => this.handleInputChange(event, this.validateStartDate)} />    
+                                onChange={(event) => this.handleInputChange(event, this.validateStartDate ,'Start date')} />    
                         </FormItem>
                         <FormItem label="End Date"
                             hasFeedback
@@ -139,48 +247,50 @@ class CreateProject extends Component {
                                 placeholder="End Date"
                                 value={this.state.endDate.value} 
                                 onBlur={this.validateEndDate}
-                                onChange={(event) => this.handleInputChange(event, this.validateEndDate)} />    
+                                onChange={(event) => this.handleInputChange(event, this.validateEndDate,'End date')} />    
                         </FormItem>
                         <FormItem 
-                            label="Manager Email"
+                            label="Project Manager"
                             hasFeedback
-                            validateStatus={this.state.managerEmail.validateStatus}
-                            help={this.state.managerEmail.errorMsg}>
-                            <Input 
+                            validateStatus={this.state.pmUserName.validateStatus}
+                            help={this.state.pmUserName.errorMsg}>
+                            <Select 
                                 size="large"
-                                name="managerEmail"
-                                type="email" 
+                                name="pmUserName"
                                 autoComplete="off"
-                                placeholder="Manager email"
-                                value={this.state.managerEmail.value} 
-                                onBlur={this.validateManagerEmailAvailability}
-                                onChange={(event) => this.handleInputChange(event, this.validateManagerEmail)} />    
+                                placeholder="Select Project Manager"
+                                onBlur={(event) => this.checkProjectManagerAvailabilityForUser(event)}
+                                options={lvPMListView} 
+                                onChange={(event) => this.handlePMUserNameChange(event, this.validateNameField, 'Project Manager')} 
+                            />     
                         </FormItem>
                         <FormItem label="Sub Lob Name"
                             hasFeedback
-                            validateStatus={this.state.subLobName.validateStatus}
-                            help={this.state.subLobName.errorMsg}>
-                            <Input 
+                            validateStatus={this.state.subLobId.validateStatus}
+                            help={this.state.subLobId.errorMsg}>
+                            <Select 
                                 size="large"
-                                name="subLobName" 
+                                name="subLobId"
                                 autoComplete="off"
-                                placeholder="Sub LOB name"
-                                value={this.state.subLobName.value} 
-                                onBlur={this.validateSubLobNameAvailability}
-                                onChange={(event) => this.handleInputChange(event, this.validateSubLobName)} />    
+                                placeholder="Select Sub LoB"
+                                onBlur={(event) => this.uiCheckSubLobAvailabilityForUser(event)}
+                                options={lvSubLobListView} 
+                                onChange={(event) => this.handleSubLobIDChange(event, this.checkIDSelection, 'Sub Lob')} 
+                            />    
                         </FormItem>
                         <FormItem label="Customer name"
                             hasFeedback
-                            validateStatus={this.state.customerName.validateStatus}
-                            help={this.state.customerName.errorMsg}>
-                            <Input 
+                            validateStatus={this.state.customerId.validateStatus}
+                            help={this.state.customerId.errorMsg}>
+                            <Select 
                                 size="large"
-                                name="customerName" 
+                                name="customerId"
                                 autoComplete="off"
-                                placeholder="Customer name"
-                                value={this.state.customerName.value} 
-                                onBlur={this.validateCustomerNameAvailability}
-                                onChange={(event) => this.handleInputChange(event, this.validateCustomerName)} />    
+                                placeholder="Select Customer"
+                                onBlur={(event) => this.uiCheckCustomerIdAvailabilityForUser(event)}
+                                options={lvCustomerListView} 
+                                onChange={(event) => this.handleCustomerIDChange(event, this.checkIDSelection, 'Customer')} 
+                            />    
                         </FormItem>
                        
                         <FormItem>
@@ -197,20 +307,129 @@ class CreateProject extends Component {
         );
     }
 
+    uiCheckSubLobAvailabilityForUser(event) {
+        // First check for client side errors in sbuname
+
+        const subLobIdValue = this.state.subLobId.value;
+        const subLobIdValidation = this.validateNameField(subLobIdValue, 'Sub Lob');
+
+        if(subLobIdValidation.validateStatus === 'error') {
+            this.setState({
+                subLobId: {
+                    value: subLobIdValue,
+                    ...subLobIdValidation
+                }
+            });
+            return;
+        }
+
+        this.setState({
+            subLobId: {
+                value: subLobIdValue,
+                validateStatus: 'validating',
+                errorMsg: null
+            }
+        });
+
+        serCheckSubLobIDAvailabilityForUser(subLobIdValue)
+        .then(response => {
+            if(response.available) {
+                this.setState({
+                    subLobId: {
+                        value: subLobIdValue,
+                        validateStatus: 'success',
+                        errorMsg: null
+                    }
+                });
+            } else {
+                this.setState({
+                    subLobId: {
+                        value: subLobIdValue,
+                        validateStatus: 'error',
+                        errorMsg: 'This SBU head name is not valid'
+                    }
+                });
+            }
+        }).catch(error => {
+            // Marking validateStatus as success, Form will be recchecked at server
+            this.setState({
+                subLobId: {
+                    value: subLobIdValue,
+                    validateStatus: 'success',
+                    errorMsg: null
+                }
+            });
+        });
+    }
+
+    uiCheckCustomerIdAvailabilityForUser(event) {
+        // First check for client side errors in sbuname
+
+        const customerIdValue = this.state.customerId.value;
+        const customerIdValidation = this.validateNameField(customerIdValue, 'Customer');
+
+        if(customerIdValidation.validateStatus === 'error') {
+            this.setState({
+                customerId: {
+                    value: customerIdValue,
+                    ...customerIdValidation
+                }
+            });
+            return;
+        }
+        this.setState({
+            customerId: {
+                value: customerIdValue,
+                validateStatus: 'validating',
+                errorMsg: null
+            }
+        });
+
+        serCheckCustomerIdAvailabilityForUser(customerIdValue)
+        .then(response => {
+            if(response.available) {
+                this.setState({
+                    customerId: {
+                        value: customerIdValue,
+                        validateStatus: 'success',
+                        errorMsg: null
+                    }
+                });
+            } else {
+                this.setState({
+                    customerId: {
+                        value: customerIdValue,
+                        validateStatus: 'error',
+                        errorMsg: 'This SBU head name is not valid'
+                    }
+                });
+            }
+        }).catch(error => {
+            // Marking validateStatus as success, Form will be recchecked at server
+            this.setState({
+                customerId: {
+                    value: customerIdValue,
+                    validateStatus: 'success',
+                    errorMsg: null
+                }
+            });
+        });
+    }
+
     // Validation Functions
 
-    validateProjectName = (projectName) => {
-        if(!projectName) {
+    validateNameField = (nameField, label) => {
+        if(!nameField) {
             return {
                 validateStatus: 'error',
-                errorMsg: 'Project name may not be empty'                
+                errorMsg: label+' name may not be empty'                
             }
         }
 
-        if(projectName.length > ANYNAME_MAX_LENGTH) {
+        if(nameField.length > ANYNAME_MAX_LENGTH) {
             return {
                 validateStatus: 'error',
-                errorMsg: `Project name is too long (Maximum ${ANYNAME_MAX_LENGTH} characters allowed)`
+                errorMsg: label + ` name is too long (Maximum ${ANYNAME_MAX_LENGTH} characters allowed)`
             }
         }
 
@@ -220,103 +439,74 @@ class CreateProject extends Component {
         }
     }
 
+    checkIDSelection = (nameField, label) => {
+        console.log('nameField = '+nameField.id);
+        if(nameField.id < 1) {
+            return {
+                validateStatus: 'error',
+                errorMsg: label+' name may not be empty'                
+            }
+        }
+        return {
+            validateStatus: null,
+            errorMsg: null
+        }
+    }
+
+    isFormInvalid() {
+        return !(
+            this.state.projectName.validateStatus === 'success' &&
+            this.state.startDate.validateStatus === 'success' &&
+            this.state.endDate.validateStatus === 'success' &&
+            this.state.pmUserName.validateStatus === 'success' &&
+            this.state.subLobId.validateStatus === 'success' &&
+            this.state.customerId.validateStatus === 'success'
+        );
+    }
+
     validateStartDate = (startDate) => {
-        if(!startDate) {
+        if(!validator.isDate(startDate)) {
             return {
                 validateStatus: 'error',
                 errorMsg: 'Start date may not be empty'                
             }
         }
+        console.log('valid');
         return {
-            validateStatus: null,
+            validateStatus: 'success',
             errorMsg: null
         }
     }
 
     validateEndDate = (endDate) => {
-        if(!endDate) {
+        if(!validator.isDate(endDate)) {
             return {
                 validateStatus: 'error',
                 errorMsg: 'End date may not be empty'                
             }
         }
+
+        var stDate = new Date(this.state.startDate.value); 
+        var enDate = new Date(endDate); 
+
+        if(enDate.getTime() < stDate.getTime()) {
+            return {
+                validateStatus: 'error',
+                errorMsg: 'End date should be after start date'                
+            }
+        }
         return {
-            validateStatus: null,
+            validateStatus: 'success',
             errorMsg: null
         }
     }
 
-    validateManagerEmail = (managerEmail) => {
-        if(!managerEmail) {
-            return {
-                validateStatus: 'error',
-                errorMsg: 'Email may not be empty'                
-            }
-        }
-
-        const EMAIL_REGEX = RegExp('[^@ ]+@[^@ ]+\\.[^@ ]+');
-        if(!EMAIL_REGEX.test(managerEmail)) {
-            return {
-                validateStatus: 'error',
-                errorMsg: 'Email not valid'
-            }
-        }
-
-        if(managerEmail.length > MANAGEREMAIL_MAX_LENGTH) {
-            return {
-                validateStatus: 'error',
-                errorMsg: `Email is too long (Maximum ${MANAGEREMAIL_MAX_LENGTH} characters allowed)`
-            }
-        }
-
-        return {
-            validateStatus: null,
-            errorMsg: null
-        }
-    }
-
-    validateSubLobName = (subLobName) => {
-        if(subLobName.length < ANYNAME_MIN_LENGTH) {
-            return {
-                validateStatus: 'error',
-                errorMsg: `Sub LOB name is too short (Minimum ${ANYNAME_MIN_LENGTH} characters needed.)`
-            }
-        } else if (subLobName.length > ANYNAME_MAX_LENGTH) {
-            return {
-                validationStatus: 'error',
-                errorMsg: `Sub LOB name is too long (Maximum ${ANYNAME_MAX_LENGTH} characters allowed.)`
-            }
-        } else {
-            return {
-                validateStatus: null,
-                errorMsg: null
-            }
-        }
-    }
-
-    validateCustomerName = (customerName) => {
-        if(customerName.length < ANYNAME_MIN_LENGTH) {
-            return {
-                validateStatus: 'error',
-                errorMsg: `Customer name is too short (Minimum ${ANYNAME_MIN_LENGTH} characters needed.)`
-            }
-        } else if (customerName.length > ANYNAME_MAX_LENGTH) {
-            return {
-                validationStatus: 'error',
-                errorMsg: `Customer name is too long (Maximum ${ANYNAME_MAX_LENGTH} characters allowed.)`
-            }
-        } else {
-            return {
-                validateStatus: null,
-                errorMsg: null
-            }
-        }
-    }
+   
 
     validateProjectNameAvailability() {
         // First check for client side errors in projectname
         const projectNameValue = this.state.projectName.value;
-        const projectNameValidation = this.validateProjectName(projectNameValue);
+        const projectNameValidation = this.validateNameField(projectNameValue, 'Project Name');
 
         if(projectNameValidation.validateStatus === 'error') {
             this.setState({
@@ -367,53 +557,52 @@ class CreateProject extends Component {
         });
     }
 
-    validateManagerEmailAvailability() {
-        // First check for client side errors in email
-        const managerEmailValue = this.state.managerEmail.value;
-        const managerEmailValidation = this.validateManagerEmail(managerEmailValue);
+    checkProjectManagerAvailabilityForUser(event) {
+        const pmUserNameValue = this.state.pmUserName.value;
+        const pmUserNameValidation = this.validateNameField(pmUserNameValue, 'Project Manager');
 
-        if(managerEmailValidation.validateStatus === 'error') {
+        if(pmUserNameValidation.validateStatus === 'error') {
             this.setState({
-                managerEmail: {
-                    value: managerEmailValue,
-                    ...managerEmailValidation
+                pmUserName: {
+                    value: pmUserNameValue,
+                    ...pmUserNameValidation
                 }
-            });    
+            });
             return;
         }
 
         this.setState({
-            managerEmail: {
-                value: managerEmailValue,
+            pmUserName: {
+                value: pmUserNameValue,
                 validateStatus: 'validating',
                 errorMsg: null
             }
         });
 
-        checkManagerEmailAvailability(managerEmailValue)
+        confirmProjectManagerAvailabilityForUser(pmUserNameValue)
         .then(response => {
             if(response.available) {
                 this.setState({
-                    managerEmail: {
-                        value: managerEmailValue,
+                    pmUserName: {
+                        value: pmUserNameValue,
                         validateStatus: 'success',
                         errorMsg: null
                     }
                 });
             } else {
                 this.setState({
-                    managerEmail: {
-                        value: managerEmailValue,
+                    pmUserName: {
+                        value: pmUserNameValue,
                         validateStatus: 'error',
-                        errorMsg: 'Manager email does not exist'
+                        errorMsg: 'This Project Manager name is not valid'
                     }
                 });
             }
         }).catch(error => {
             // Marking validateStatus as success, Form will be recchecked at server
             this.setState({
-                managerEmail: {
-                    value: managerEmailValue,
+                pmUserName: {
+                    value: pmUserNameValue,
                     validateStatus: 'success',
                     errorMsg: null
                 }

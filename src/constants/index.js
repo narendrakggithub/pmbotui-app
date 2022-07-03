@@ -1,7 +1,7 @@
 export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api';
 export const ACCESS_TOKEN = 'accessToken';
 
-export const COMMAND = 'npm install react-scripts; npm i react-autocomplete --save; npm i --save react-select';
+export const COMMAND = 'npm install react-scripts; npm i --save react-select; npm install validator';
 
 export const APP_NAME = 'PMBot';
 
@@ -25,12 +25,4 @@ export const MANAGEREMAIL_MAX_LENGTH = 40;
 export const PASSWORD_MIN_LENGTH = 6;
 export const PASSWORD_MAX_LENGTH = 20;
 
-export const ROLE_ASSOCIATE = 1;
-export const ROLE_PROJECTMANAGER = 2;
-export const ROLE_SUBLOBLEAD = 3;
-export const ROLE_LOBLEAD = 4;
-export const ROLE_EDL = 5;
-export const ROLE_PDL = 6;
-export const ROLE_SBUHEAD = 7;
-export const ROLE_ADMIN = 8;
 

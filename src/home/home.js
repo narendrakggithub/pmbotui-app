@@ -24,22 +24,20 @@ class Home extends Component {
     }
 
     render() {
-        let message;
         let page;
 
         if (this.props.isAuthenticated) {
-            message = 'logged in';
-            page = <Dashboard/>;
+            page = <Dashboard isAuthenticated={this.props.isAuthenticated} 
+            currentUser={this.props.currentUser}/>; 
           } else {
-            message = 'not logged in';
             page = <GeneralPage/>;
           }
 
         return (
-            <div className="home-container">
+            <div >
                 {
                     !this.state.isLoading  ? (
-                        <div className="no-polls-found">
+                        <div >
                             {page}
                         </div>    
                         

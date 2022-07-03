@@ -6,13 +6,14 @@ import {
 import './AppHeader.css';
 import pollIcon from '../poll.svg';
 import { Layout, Menu, Dropdown, Icon } from 'antd';
-
+import { Role } from '../common/role';
 const Header = Layout.Header;
     
 class AppHeader extends Component {
     constructor(props) {
         super(props);   
         this.handleMenuClick = this.handleMenuClick.bind(this);   
+        this.hasRole = this.hasRole.bind(this);   
     }
 
     handleMenuClick({ key }) {
@@ -21,31 +22,68 @@ class AppHeader extends Component {
       }
     }
 
+    hasRole(role) {
+      let roles = this.props.currentUser.authorities;
+      let result = false;
+      for (var i = 0; i < roles.length; i++) {
+        var item = roles[i];
+        if(role===item.authority) {
+          result = true;
+          break;
+        }
+      }
+      return result;
+    }
+
     render() {
         let menuItems;
         if(this.props.currentUser) {
-          menuItems = [
-        <Menu.Item key="/">
-          <Link to="/">
-           <Icon type="home" className="nav-icon" />
-          </Link>
-        </Menu.Item>,
-        <Menu.Item key="/poll/new">
-          <Link to="/poll/new">
-           <img src={pollIcon} alt="poll" className="poll-icon" />
-          </Link>
-        </Menu.Item>,
-        <Menu.Item key="/project/createProject" className="create-menu">
-          <CreateDropdownMenu 
-          currentUser={this.props.currentUser} 
-          handleMenuClick={this.handleMenuClick}/>
-        </Menu.Item>,
-        <Menu.Item key="/profile" className="profile-menu">
-          <ProfileDropdownMenu 
-          currentUser={this.props.currentUser} 
-          handleMenuClick={this.handleMenuClick}/>
-        </Menu.Item>
-          ]; 
+          if(this.hasRole(Role.CustomerLead) || this.hasRole(Role.SubLOBLead) ||
+          this.hasRole(Role.LOBLead) || this.hasRole(Role.EDL) || 
+          this.hasRole(Role.SBUHead) ||
+          this.hasRole(Role.Admin)) {
+            menuItems = [
+              <Menu.Item key="/">
+                <Link to="/">
+                  <Icon type="home" className="nav-icon" />
+                </Link>
+              </Menu.Item>,
+              <Menu.Item key="/poll/new">
+                <Link to="/poll/new">
+                  <img src={pollIcon} alt="poll" className="poll-icon" />
+                </Link>
+              </Menu.Item>,      
+              <Menu.Item key="/project/createProject" className="create-menu">
+                <CreateDropdownMenu 
+                currentUser={this.props.currentUser} 
+                handleMenuClick={this.handleMenuClick}/>
+              </Menu.Item>,
+              <Menu.Item key="/profile" className="profile-menu">
+                <ProfileDropdownMenu 
+                currentUser={this.props.currentUser} 
+                handleMenuClick={this.handleMenuClick}/>
+              </Menu.Item>
+                ]; 
+          } else {
+            menuItems = [
+              <Menu.Item key="/">
+                <Link to="/">
+                  <Icon type="home" className="nav-icon" />
+                </Link>
+              </Menu.Item>,
+              <Menu.Item key="/poll/new">
+                <Link to="/poll/new">
+                  <img src={pollIcon} alt="poll" className="poll-icon" />
+                </Link>
+              </Menu.Item>,      
+              <Menu.Item key="/profile" className="profile-menu">
+                <ProfileDropdownMenu 
+                currentUser={this.props.currentUser} 
+                handleMenuClick={this.handleMenuClick}/>
+              </Menu.Item>
+                ]; 
+          }
+          
         } else {
           menuItems = [
             <Menu.Item key="/login">
@@ -111,27 +149,70 @@ function ProfileDropdownMenu(props) {
   );
 }
 
+function hasRole(role, props) {
+  let roles = props.currentUser.authorities;
+  let result = false;
+  for (var i = 0; i < roles.length; i++) {
+    var item = roles[i];
+    if(role === item.authority) {
+      result = true;
+      break;
+    }
+  }
+  return result;
+}
+
 function CreateDropdownMenu(props) {
   const dropdownMenu = (
     <Menu onClick={props.handleMenuClick} className="create-dropdown-menu">
-      <Menu.Item key="project" className="dropdown-item">
-        <Link to="/project/createProject">Project</Link>
-      </Menu.Item>
-      <Menu.Item key="subLob" className="dropdown-item">
-        <Link to="/subLob/createSubLob">Sub LOB</Link>
-      </Menu.Item>
-      <Menu.Item key="customer" className="dropdown-item">
-        <Link to="/customer/createCustomer">Customer</Link>
-      </Menu.Item>
-      <Menu.Item key="lob" className="dropdown-item">
-        <Link to="/lob/createLob">LOB</Link>
-      </Menu.Item>
-      <Menu.Item key="account" className="dropdown-item">
-       <Link to="/account/createAccount">Account</Link>
-      </Menu.Item>
-      <Menu.Item key="sbu" className="dropdown-item">
-        <Link to="/sbu/createSbu">SBU</Link>
-      </Menu.Item>
+      { !(hasRole(Role.SubLOBLead, props) || hasRole(Role.CustomerLead, props))
+        ?""
+         :(
+          <Menu.Item key="project" className="dropdown-item">
+            <Link to="/project/createProject">Project</Link>
+          </Menu.Item>
+          )
+      }
+      { !hasRole(Role.LOBLead, props)
+        ?""
+         :(
+          <Menu.Item key="subLob" className="dropdown-item">
+            <Link to="/subLob/createSubLob">Sub LOB</Link>
+          </Menu.Item>
+          )
+      }
+      {!hasRole(Role.EDL, props)
+        ? "" 
+        : (
+          <Menu.Item key="customer" className="dropdown-item">
+            <Link to="/customer/createCustomer">Customer</Link>
+          </Menu.Item>
+          )
+      }
+      {!hasRole(Role.EDL, props)
+        ? "" 
+        : (
+          <Menu.Item key="lob" className="dropdown-item">
+            <Link to="/lob/createLob">LOB</Link>
+          </Menu.Item>
+          )
+      }
+      {!hasRole(Role.SBUHead, props)
+        ? "" 
+        : (
+          <Menu.Item key="account" className="dropdown-item">
+            <Link to="/account/createAccount">Account</Link>
+          </Menu.Item>
+          )
+      }
+      {!hasRole(Role.Admin, props)
+        ? "" 
+        : (
+          <Menu.Item  key="sbu" className="dropdown-item">
+            <Link to="/sbu/createSbu">SBU</Link>
+          </Menu.Item>
+          )
+      }
     </Menu>
   );
 

@@ -154,7 +154,7 @@ class CreateLOB extends Component {
 
         const lobLeadFullNameViews = [];
         this.state.lobLeadsInfo.forEach((item, index) => {
-            lobLeadFullNameViews.push({value: item.userName, label:item.userName});   
+            lobLeadFullNameViews.push({value: item.userName, label:item.fullName});   
         });
 
         
